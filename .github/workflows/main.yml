@@ -1,11 +1,9 @@
 name: Sync S3 DAGs and settings
 
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
+  push:
+    branches:
+      - Kenebehi-workflow
 
 jobs:
   sync-dags:
