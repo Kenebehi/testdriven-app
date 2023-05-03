@@ -15,7 +15,10 @@ jobs:
 
       - name: Get Changed Files
         id: get-changed-files
-        run: echo "EDITED_FILES=$(git diff --name-only -r HEAD^1 HEAD )" >> "$GITHUB_OUTPUT"
+        run: |
+          message=$(git diff --name-only -r HEAD^1 HEAD )
+          message=$(echo $message | tr '\n' ' ')
+          echo "EDITED_FILES=$message" >> "$GITHUB_OUTPUT"
       - name: Get color
         run: echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
 
