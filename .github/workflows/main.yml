@@ -21,13 +21,8 @@ jobs:
       - name: Get Changed Files
         id: get-changed-files
         run: |
-          changed_files=$(git diff --name-only -r HEAD^1 HEAD)
-          echo "::set-output name=changed_files::$changed_files"
-          echo "name=changed_files" >> $GITHUB_OUTPUT
+          echo $(git diff --name-only -r HEAD^1 HEAD) >> "$GITHUB_ENV"
 
       - name: Do Something with Changed Files
         run: |
-          files=$1
-          # Do something with the changed files
-          echo "${{ steps.get-changed-files.changed_files }}"
-          echo $GITHUB_OUTPUT
+          echo "${{ env.action_state }}"
