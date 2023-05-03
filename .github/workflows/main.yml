@@ -17,14 +17,21 @@ jobs:
         id: tests
         run: |
           git diff --name-only -r HEAD^1 HEAD 
+      - name: Set color
+        id: random-color-generator
+        run: echo "SELECTED_COLOR=green" >> "$GITHUB_OUTPUT"
+      - name: Get color
 
-      - name: Get Changed Files
-        id: get-changed-files
-        run: |
-          edited_files = $(git diff --name-only -r HEAD^1 HEAD)
-          echo "EDITED_FILES=edited_files" >> "$GITHUB_OUTPUT"
+        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
 
-      - name: Do Something with Changed Files
-        run: |
-          echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
+
+      # - name: Get Changed Files
+      #   id: get-changed-files
+      #   run: |
+      #     edited_files = $(git diff --name-only -r HEAD^1 HEAD)
+      #     echo "EDITED_FILES=edited_files" >> "$GITHUB_OUTPUT"
+
+      # - name: Do Something with Changed Files
+      #   run: |
+      #     echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
 
