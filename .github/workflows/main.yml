@@ -19,10 +19,10 @@ jobs:
           git diff --name-only -r HEAD^1 HEAD 
       - name: Set color
         id: random-color-generator
-        run: echo "SELECTED_COLOR=$(git diff --name-only -r HEAD^1 HEAD )" >> "$GITHUB_OUTPUT"
+        run: echo "EDITED_FILES=$(git diff --name-only -r HEAD^1 HEAD )" >> "$GITHUB_OUTPUT"
       - name: Get color
 
-        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
+        run: echo "The selected color is ${{ steps.random-color-generator.outputs.EDITED_FILES }}"
 
 
       # - name: Get Changed Files
