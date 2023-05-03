@@ -13,20 +13,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get changed files in the dags folder
-        id: tests
-        run: |
-          git diff --name-only -r HEAD^1 HEAD 
-      - name: Set color
-        id: random-color-generator
+      - name: Get Changed Files
+        id: get-changed-files
         run: echo "EDITED_FILES=$(git diff --name-only -r HEAD^1 HEAD )" >> "$GITHUB_OUTPUT"
       - name: Get color
+        run: echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
 
-        run: echo "The selected color is ${{ steps.random-color-generator.outputs.EDITED_FILES }}"
 
-
-      # - name: Get Changed Files
-      #   id: get-changed-files
+      # - name: 
+      #   id: 
       #   run: |
       #     edited_files = $(git diff --name-only -r HEAD^1 HEAD)
       #     echo "EDITED_FILES=edited_files" >> "$GITHUB_OUTPUT"
