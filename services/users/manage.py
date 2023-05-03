@@ -1,6 +1,7 @@
 # services/users/manage.py
 from flask.cli import FlaskGroup
 
+#setup app
 from project import app, db
 
 cli = FlaskGroup(app)
