@@ -19,7 +19,7 @@ jobs:
           git diff --name-only -r HEAD^1 HEAD
 
       - name: Run step if any file(s) in the dags folder change
-        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        if: steps.tests.outputs.stdout == 'true'
         run: |
           echo "One or more files in the docs folder has changed."
           echo "List all the files that have changed: ${{ steps.tests.outputs.stdout }}"
