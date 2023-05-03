@@ -18,13 +18,14 @@ jobs:
         run: |
           git diff --name-only -r HEAD^1 HEAD 
 
-      - name: Run step if any file(s) in the dags folder change
+      - name: Get Changed Files
+        id: get-changed-files
         run: |
-          echo "One or more files in the docs folder has changed."
-          echo "List all the files that have changed: ${{ steps.tests.outputs.stdout }}"
+          changed_files=$(git diff --name-only -r HEAD^1 HEAD)
+          echo "::set-output name=files::$changed_files"
 
-      - name: Set color
-        id: random-color-generator
-        run: git diff --name-only -r HEAD^1 HEAD >> $GITHUB_OUTPUT
-      - name: Get color
-        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
+      - name: Do Something with Changed Files
+        run: |
+          files=$1
+          # Do something with the changed files
+          echo $files
