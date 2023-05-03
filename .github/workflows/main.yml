@@ -1,4 +1,4 @@
-name: Sync S3 DAGs and settings
+name: Sync to S3
 
 on:
   push:
@@ -40,5 +40,4 @@ jobs:
             AWS_S3_ACL: private
             SOURCE_DIR: .
             INCLUDE_REGEX: ${{ steps.fetch-changed-files.outputs.files }}
-          run: |
-            echo "${{ steps.fetch-changed-files.outputs.files }}" | tr -d '[],' > /tmp/include.txt
+          run: echo "${{ steps.fetch-changed-files.outputs.files }}" | tr -d '[],' > /tmp/include.txt
