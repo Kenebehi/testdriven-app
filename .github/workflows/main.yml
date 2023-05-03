@@ -22,10 +22,10 @@ jobs:
         id: get-changed-files
         run: |
           changed_files=$(git diff --name-only -r HEAD^1 HEAD)
-          echo "::set-output name=files::$changed_files"
+          echo "::set-output name=changed_files::$changed_files"
 
       - name: Do Something with Changed Files
         run: |
           files=$1
           # Do something with the changed files
-          echo $files
+          echo "${{ steps.get-changed-files.changed_files }}"
