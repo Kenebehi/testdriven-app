@@ -1,6 +1,5 @@
 # services/users/manage.py
 from flask.cli import FlaskGroup
-import pandas as pd
 
 #setup app
 from project import app, db
