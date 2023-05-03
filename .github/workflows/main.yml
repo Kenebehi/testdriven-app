@@ -14,4 +14,8 @@ jobs:
       - name: Get changed files
         run: |
           echo "Changed files:"
-          git diff --name-only HEAD^ HEAD | while read file; do realpath "$file"; done
+          if git rev-parse --verify HEAD >/dev/null 2>&1; then
+            git diff --name-only HEAD^ HEAD
+          else
+            git ls-tree --name-only -r HEAD
+          fi | while read file; do realpath "$file"; done
