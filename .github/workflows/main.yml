@@ -14,10 +14,9 @@ jobs:
           fetch-depth: 0
 
       - name: Get changed files in the dags folder
-        id: changed-files-specific
-        uses: tj-actions/changed-files@v35
-        with:
-          files: services/*.{py}
+        run: |
+          git diff --name-only -r HEAD^1 HEAD
+
 
       - name: Assume IAM role
         uses: aws-actions/configure-aws-credentials@v1
