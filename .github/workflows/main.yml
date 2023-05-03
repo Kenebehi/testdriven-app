@@ -14,20 +14,12 @@ jobs:
           fetch-depth: 0
 
       - name: Get changed files in the dags folder
+        id: tests
         run: |
           git diff --name-only -r HEAD^1 HEAD
-
-
-      - name: Assume IAM role
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: eu-west-1
-          role-to-assume: arn:aws:iam::985437859871:role/github-actions-runner
-          role-duration-seconds: 1200
-          role-skip-session-tagging: true
 
       - name: Run step if any file(s) in the dags folder change
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: |
           echo "One or more files in the docs folder has changed."
-          echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
+          echo "List all the files that have changed: ${{ steps.tests.outputs.stdout }}"
