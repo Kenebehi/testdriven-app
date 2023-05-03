@@ -1,35 +1,17 @@
-name: Sync to S3
+name: Echo Changed Files
 
 on:
   push:
-    branches:
-      - Kenebehi-workflow
+    branches: [ Kenebehi-workflow ]
 
 jobs:
-  sync:
+  echo-files:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Fetch changed files
-        id: fetch-changed-files
-        uses: juliangruber/git-changed-files@v1.x
-        with:
-          format: json
-          ref: ${{ github.sha }}
-
-      - name: Assume IAM role
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: eu-west-1
-          role-to-assume: arn:aws:iam::985437859871:role/github-actions-runner
-          role-duration-seconds: 1200
-          role-skip-session-tagging: true
-
-      - name: S3 upload DAGs
-        env:
-          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
+      - name: Get changed files
         run: |
-          aws s3 sync  $S3_AIRFLOW_DIR/staging/dags/${{ steps.fetch-changed-files.outputs.files }} --delete;
+          echo "Changed files:"
+          git diff --name-only HEAD^ HEAD | while read file; do realpath "$file"; done
