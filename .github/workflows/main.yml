@@ -21,7 +21,7 @@ jobs:
           echo "EDITED_FILES=$message" >> "$GITHUB_OUTPUT"
       - name: Get Files
         run: |
-          echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          SERVICES=${{ steps.get-changed-files.outputs.EDITED_FILES }}| tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' '
-          echo $SERVICES
+          # echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
+          SERVICES=${{ steps.get-changed-files.outputs.EDITED_FILES }}
+          echo "$SERVICES"| tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' '
 
