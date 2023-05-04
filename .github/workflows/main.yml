@@ -52,7 +52,6 @@ jobs:
         id: get-updated-configurations
         run: |
           EDITED_CONF="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "settings/.*\.yml" | awk -F/ '{print $NF}' | tr '\n' ' ')"
           FILES="$(echo $EDITED_FILES_LIST | sed 's/setting\///g'  | tr '\n' ' ')"
           echo "$FILES"
           
