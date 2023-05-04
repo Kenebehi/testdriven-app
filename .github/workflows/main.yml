@@ -40,6 +40,17 @@ jobs:
       - name: Sync Only Updated DAGs
         run: |
           files="${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}"
-          for file in ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}; do
-            echo aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" --include $(basename $file)
+    
+          include=""
+          for file in $files; do
+            include="$include --include $file"
           done
+          echo $include
+          
+          echo aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" $include
+
+          
+
+#          for file in ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}; do
+#            echo aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" --include $(basename $file)
+#          done
