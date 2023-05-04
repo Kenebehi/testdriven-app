@@ -21,10 +21,25 @@ jobs:
           files: |
             airflow/dags/**
 
+      - name: Get changed files in Configurations
+        id: updated-dags-files
+        uses: tj-actions/changed-files@v35
+        with:
+          base_sha: "${{ github.event.workflow_run.head_sha }}"
+          files: |
+            settings/**
+
+      - name: Get changed files for DAG Utils
+        id: changed-dags-files
+        uses: tj-actions/changed-files@v35
+        with:
+          base_sha: "${{ github.event.workflow_run.head_sha }}"
+          files: |
+            utils/dag_utils/**
+
       - name: Re-sync affected DAGs
         run: |
           files="${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}"
-          echo $(echo "$files" | sed 's/airflow\///g')
-          for file in ${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}; do
-            echo aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" --include "**$(basename $file)"
+          for file in ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}; do
+            echo aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" --include $(basename $file)
           done
