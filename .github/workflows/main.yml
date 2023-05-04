@@ -59,14 +59,13 @@ jobs:
           DELETED_RENAMED_FILES="${{ steps.get-renamed-files.outputs.RENAMED_FILES }} ${{ steps.get-deleted-files.outputs.DELETED_FILES }}"
           FILES="$(echo $DELETED_RENAMED_FILES | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
           echo "this is my expected output $FILES"
-          echo "$DELETED_RENAMED_FILES"
           
-#          EXCLUDES=""
-#          for file in $FILES; do
-#              EXCLUDES="$EXCLUDES $S3_AIRFLOW_DIR/$file"
-#          done
-#          echo "$EXCLUDES"
-#          echo "$EXCLUDED_DAGS=$EXCLUDES" >> "$GITHUB_OUTPUT"
+          DAGS_TO_DELETE=""
+          for file in $FILES; do
+              DAGS_TO_DELETE=$DAGS_TO_DELETE $S3_AIRFLOW_DIR/$file"
+          done
+          echo "$DAGS_TO_DELETE"
+          echo "$REMOVED_DAGS=$DAGS_TO_DELETE" >> "$GITHUB_OUTPUT"
 
 #      - name: Sync DAGS
 #        run: |
