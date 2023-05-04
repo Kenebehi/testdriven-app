@@ -14,14 +14,14 @@ jobs:
           fetch-depth: 2
 
       - name: Get changed files for Airflow Staging DAGs
-        id: changed-dags-files
+        id: updated-dags-files
         uses: tj-actions/changed-files@v35
         with:
           base_sha: "${{ github.event.workflow_run.head_sha }}"
           files: |
             airflow/dags/**
 
-      - name: Get changed files in Configurations
+      - name: Get Updated files in Configurations
         id: updated-configuration-files
         uses: tj-actions/changed-files@v35
         with:
@@ -29,15 +29,15 @@ jobs:
           files: |
             settings/**
 
-      - name: Get changed files for DAG Utils
-        id: updated-utils-files
+      - name: Get Updated files for DAG Utils
+        id: updated-dag-utils-files
         uses: tj-actions/changed-files@v35
         with:
           base_sha: "${{ github.event.workflow_run.head_sha }}"
           files: |
             utils/dag_utils/**
 
-      - name: Re-sync affected DAGs
+      - name: Sync Only Updated DAGs
         run: |
           files="${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}"
           for file in ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}; do
