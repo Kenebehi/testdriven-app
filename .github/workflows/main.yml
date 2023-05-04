@@ -39,7 +39,7 @@ jobs:
 
       - name: Sync Only Updated DAGs
         run: |
-          echp "${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}"
+          echo "${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}"
     
           include=""
           for file in "${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}"; do
