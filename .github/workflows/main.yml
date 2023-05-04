@@ -27,29 +27,14 @@ jobs:
           message=$(echo $message | tr '\n' ' ')
           echo "DELETED_FILES=$message" >> "$GITHUB_OUTPUT"
 
-      - name: S3 upload DAGs
-        env:
-          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
-        run: |
-          echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          echo "The deleted files is ${{ steps.get-changed-files.outputs.DELETED_FILES }}"
-          EDITED_FILES_LIST="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "./airflow/dags/ /.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
-          echo $FILES
-
-          INCLUDES=""
-          for path in $FILES; do
-              INCLUDES="$INCLUDES --include $path"
-          done
-          echo "$INCLUDES"
-
-
-      # - name: Get Files
+      # - name: S3 upload DAGs
+      #   env:
+      #     S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
       #   run: |
       #     echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-      #     echo "The selected files is ${{ steps.get-changed-files.outputs.DELETED_FILES }}"
-      #     SERVICES="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-      #     FILES="$(echo $SERVICES | tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
+      #     echo "The deleted files is ${{ steps.get-changed-files.outputs.DELETED_FILES }}"
+      #     EDITED_FILES_LIST="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
+      #     FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "./airflow/dags/ /.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
       #     echo $FILES
 
       #     INCLUDES=""
@@ -57,6 +42,21 @@ jobs:
       #         INCLUDES="$INCLUDES --include $path"
       #     done
       #     echo "$INCLUDES"
+
+
+      - name: Get Files
+        run: |
+          echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
+          echo "The selected files is ${{ steps.get-changed-files.outputs.DELETED_FILES }}"
+          SERVICES="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
+          FILES="$(echo $SERVICES | tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
+          echo $FILES
+
+          INCLUDES=""
+          for path in $FILES; do
+              INCLUDES="$INCLUDES --include $path"
+          done
+          echo "$INCLUDES"
 
       #     aws s3 sync ./workers s3://your-bucket-name --exclude "*" $INCLUDES
 
