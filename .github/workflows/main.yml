@@ -38,10 +38,9 @@ jobs:
             utils/dag_utils/**
 
       - name: Sync Only Updated DAGs
-        if: ${{ steps.changed-dags-files.outputs.all_changed_and_modified_files !=0 }}
+        if: ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files !=0 }}
         run: |
           
-    
           include=""
           for file in "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"; do
             include="$include --include $file"
