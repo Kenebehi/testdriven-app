@@ -19,17 +19,8 @@ jobs:
           message=$(git diff --name-only -r HEAD^1 HEAD )
           message=$(echo $message | tr '\n' ' ')
           echo "EDITED_FILES=$message" >> "$GITHUB_OUTPUT"
-      - name: Get color
-        run: echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-
-
-      # - name: 
-      #   id: 
-      #   run: |
-      #     edited_files = $(git diff --name-only -r HEAD^1 HEAD)
-      #     echo "EDITED_FILES=edited_files" >> "$GITHUB_OUTPUT"
-
-      # - name: Do Something with Changed Files
-      #   run: |
-      #     echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
+      - name: Get Files
+        run: |
+          echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
+          SERVICES=${{ steps.get-changed-files.outputs.EDITED_FILES }}| tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' '
 
