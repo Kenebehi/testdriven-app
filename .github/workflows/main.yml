@@ -30,7 +30,7 @@ jobs:
       - name: Get All Renamed Files
         id: get-renamed-files
         run: |
-          message=$(git diff --name-status HEAD^1 HEAD | grep -E '^R')
+          message=$(git diff --name-status HEAD^1 HEAD | grep -E '^R' | awk '{print $2}')
           message=$(echo $message | tr '\n' ' ')
           echo "RENAMED_FILES=$message" >> "$GITHUB_OUTPUT"
 
