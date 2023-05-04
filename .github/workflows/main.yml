@@ -48,19 +48,36 @@ jobs:
           echo "$INCLUDES"
           echo "INCLUDED_DAGS=$INCLUDES" >> "$GITHUB_OUTPUT"
 
-      - name: Get Updated Configuration File Names
-        id: get-updated-configurations
-        run: |
-          EDITED_CONFS="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          FILES="$(echo $EDITED_CONFS | sed 's/setting\///g'  | tr '\n' ' ')"
-          echo "$FILES"
-          
-          INCLUDES=""
-          for file in $FILES; do
-              INCLUDES="$INCLUDES --include $file"
-          done
-          echo "$INCLUDES"
-          echo "INCLUDED_CONFIGURATIONS=$INCLUDES" >> "$GITHUB_OUTPUT"
+#      - name: Get Updated Configuration File Names
+#        id: get-updated-configurations
+#        run: |
+#          EDITED_CONFS="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
+#          FILES="$(echo $EDITED_CONFS | sed 's/setting\///g'  | tr '\n' ' ')"
+#          echo "$FILES"
+#
+#          INCLUDES=""
+#          for file in $FILES; do
+#              INCLUDES="$INCLUDES --include $file"
+#          done
+#          echo "$INCLUDES"
+#          echo "INCLUDED_CONFIGURATIONS=$INCLUDES" >> "$GITHUB_OUTPUT"
+
+
+#      - name: Get Deleted Or Renamed Configurations
+#        id: get-deleted-renamed-configurations
+#        env:
+#          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
+#        run: |
+#          DELETED_RENAMED_CONFIG_FILES="${{ steps.get-renamed-files.outputs.RENAMED_FILES }} ${{ steps.get-deleted-files.outputs.DELETED_FILES }}"
+#          FILES="$(echo DELETED_RENAMED_CONFIG_FILES | tr ' ' '\n' | grep "settings/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
+#          echo "this is my expected output $FILES"
+#
+#          CONFS_TO_DELETE=""
+#          for file in $FILES; do
+#              CONFS_TO_DELETE="$CONFS_TO_DELETE $S3_AIRFLOW_DIR/$file"
+#          done
+#          echo "$CONFS_TO_DELETE"
+#          echo "REMOVED_DAGS=$CONFS_TO_DELETE" >> "$GITHUB_OUTPUT"
           
 
       - name: Get Deleted Or Renamed DAGS
@@ -79,17 +96,27 @@ jobs:
           echo "$DAGS_TO_DELETE"
           echo "REMOVED_DAGS=$DAGS_TO_DELETE" >> "$GITHUB_OUTPUT"
 
-      - name: Sync Renamed and Deleted DAG's
-        if: ${{ steps.get-deleted-renamed-dags.outputs.REMOVED_DAGS != '' }}
+      - name: Sync Renamed and Deleted File
         run: |
-            echo "aws s3 rm ${{ steps.get-deleted-renamed-dags.outputs.REMOVED_DAGS }}"
+          my_function() {
+            echo "Hello, $1! $2"
+            if ${{ steps.$1.outputs.$2 != '' }}
+                echo "aws s3 rm ${{ steps.$1.outputs.$2 }}"
+            fi
+          }
 
-      - name: Sync Updated DAG's
-        if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
+      - name: Call function
         run: |
-            echo "aws s3 sync ./airflow/dags/ s3://mesh-pa-consumer-private/kenneth_odumah/dags/ ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }}"
+          # Call the function with a parameter
+          my_function "get-changed-dags" "INCLUDED_DAGS"
 
-      - name: Sync Updated Configuration Files
-        if: ${{ steps.get-updated-configurations.outputs.INCLUDED_CONFIGURATIONS != '' }}
-        run: |
-            echo "aws s3 sync ./settings/ s3://mesh-pa-consumer-private/kenneth_odumah/settings/ ${{ steps.get-changed-dags.outputs.INCLUDED_CONFIGURATIONS }}"
+
+#      - name: Sync Updated DAG
+#        if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
+#        run: |
+#            echo "aws s3 sync ./airflow/dags/ s3://mesh-pa-consumer-private/kenneth_odumah/dags/ ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }}"
+#
+#      - name: Sync Updated Configuration Files
+#        if: ${{ steps.get-updated-configurations.outputs.INCLUDED_CONFIGURATIONS != '' }}
+#        run: |
+#            echo "aws s3 sync ./settings/ s3://mesh-pa-consumer-private/kenneth_odumah/settings/ ${{ steps.get-changed-dags.outputs.INCLUDED_CONFIGURATIONS }}"
