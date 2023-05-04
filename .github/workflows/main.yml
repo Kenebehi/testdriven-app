@@ -22,7 +22,7 @@ jobs:
       - name: Get Files
         run: |
           echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          SERVICES=${{ steps.get-changed-files.outputs.EDITED_FILES }}
+          SERVICES="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
           echo $SERVICES
           echo "$SERVICES"
           # echo "$SERVICES| tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ' "
