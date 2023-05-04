@@ -70,7 +70,7 @@ jobs:
       - name: Sync DAGS
         run: |
           if: ${{ steps.get-changed-dags.outputs.EXCLUDED_DAGS != '' }}
-            echo "aws s3 rm ${{ steps.get-deleted-renamed-dags.outputs.$EXCLUDED_DAGS }}"
+            echo "aws s3 rm ${{ steps.get-deleted-renamed-dags.outputs.EXCLUDED_DAGS }}"
           fi
           
           if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
