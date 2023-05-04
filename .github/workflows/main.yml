@@ -48,11 +48,12 @@ jobs:
           echo "The deleted files is ${{ steps.get-deleted-files.outputs.DELETED_FILES }}"
           EDITED_FILES_LIST="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
           FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "./airflow/dags/ /.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
-          echo $FILES
+          echo "This files are in /airflow/dags"
+          echo "$FILES"
 
           INCLUDES=""
-          for path in $FILES; do
-              INCLUDES="$INCLUDES --include $path"
+          for file in $FILES; do
+              INCLUDES="$INCLUDES --include file"
           done
           echo "$INCLUDES"
 
