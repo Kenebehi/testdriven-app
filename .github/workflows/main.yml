@@ -51,8 +51,8 @@ jobs:
       - name: Get Updated Configuration File Names
         id: get-updated-configurations
         run: |
-          EDITED_CONF="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          FILES="$(echo $EDITED_FILES_LIST | sed 's/setting\///g'  | tr '\n' ' ')"
+          EDITED_CONFS="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
+          FILES="$(echo $EDITED_CONFS | sed 's/setting\///g'  | tr '\n' ' ')"
           echo "$FILES"
           
           INCLUDES=""
