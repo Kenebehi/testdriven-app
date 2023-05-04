@@ -47,8 +47,7 @@ jobs:
           for file in "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"; do
             include="$include --include $(basename $file)"
           done
-          echo "the files: $files"
-          echo "$include"
+
           echo "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
           
           echo aws s3 sync ./airflow/dags/ $S3_AIRFLOW_DIR/staging/dags/ --exclude "*"  $include;
