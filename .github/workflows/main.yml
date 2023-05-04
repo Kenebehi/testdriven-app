@@ -47,9 +47,9 @@ jobs:
           echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
           echo "The deleted files is ${{ steps.get-deleted-files.outputs.DELETED_FILES }}"
           EDITED_FILES_LIST="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "./airflow/dags/ /.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
-          FILE="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "airflow/dags/ /.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
-          echo "This files are in /airflow/dags $FILES and  $FILE  and $EDITED_FILES_LIST"
+          FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "./airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
+          FILE="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
+          echo "This files are in /airflow/dags $FILES and  $FILE"
           echo "$FILES"
 
           INCLUDES=""
