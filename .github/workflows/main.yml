@@ -49,8 +49,7 @@ jobs:
       - name: Sync Updated DAGS
         if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
         run: |
-           FILES="${{ steps.get-deleted-dags.outputs.INCLUDED_DAGS }}"
-           echo "Syncing updated files: $FILES"
+           echo "aws s3 sync ./airflow/dags/ s3://mesh-pa-consumer-private/kenneth_odumah/dags/ --exclude "*"  ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }}"
           
         
                     
