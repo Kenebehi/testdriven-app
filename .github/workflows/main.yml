@@ -13,34 +13,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get Changed Files
+      - name: Get All Changed Files
         id: get-changed-files
         run: |
           message=$(git diff --name-only -r HEAD^1 HEAD )
           message=$(echo $message | tr '\n' ' ')
           echo "EDITED_FILES=$message" >> "$GITHUB_OUTPUT"
 
-      - name: Get Deleted Files
+      - name: Get All Deleted Files
         id: get-deleted-files
         run: |
           message=$(git diff --diff-filter=D --name-only HEAD^ HEAD )
           message=$(echo $message | tr '\n' ' ')
           echo "DELETED_FILES=$message" >> "$GITHUB_OUTPUT"
 
-
-      - name: Get Files
-        run: |
-          SERVICES="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          FILES="$(echo $SERVICES | tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
-          echo $FILES
-
-          INCLUDES=""
-          for path in $FILES; do
-              INCLUDES="$INCLUDES --include $path"
-          done
-          echo "$INCLUDES"
-
-      - name: S3 upload DAGs
+      - name: Get All Changed DAGS
+        id: get-changed-dags
         env:
           S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
         run: |
@@ -49,12 +37,35 @@ jobs:
           EDITED_FILES_LIST="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
           FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
           echo "$FILES"
+          
+          echo "INCLUDED_DAGS=$FILES" >> "$GITHUB_OUTPUT"
 
-          INCLUDES=""
-          for file in $FILES; do
-              INCLUDES="$INCLUDES --include file"
-          done
-          echo "$INCLUDES"
+#          INCLUDES=""
+#          for file in $FILES; do
+#              INCLUDES="$INCLUDES --include $file"
+#          done
+#          echo "$INCLUDES"
+#          echo "INCLUDED_DAGS=$INCLUDES" >> "$GITHUB_OUTPUT"
+          
+
+#      - name: Sync Updated DAGS
+#        if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
+#        run: |
+#           FILES="$(echo ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }} | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}')"
+#           echo "Syncing updated files: $FILES"
+#           echo "${FILES[@]/#/--include }"
+
+      - name: Sync Updated DAGS
+        if: ${{ steps.get-changed-files.outputs.EDITED_FILES != '' }}
+        run: |
+           FILES="$(echo ${{ steps.get-changed-files.outputs.EDITED_FILES }} | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}')"
+           echo "Syncing updated files: $FILES"
+           echo "${FILES[@]/#/--include }"
+          
+        
+                    
+
+
 
       #     aws s3 sync ./workers s3://your-bucket-name --exclude "*" $INCLUDES
 
