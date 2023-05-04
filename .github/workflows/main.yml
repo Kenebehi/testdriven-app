@@ -38,29 +38,19 @@ jobs:
           FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
           echo "$FILES"
           
-          echo "INCLUDED_DAGS=$FILES" >> "$GITHUB_OUTPUT"
 
-#          INCLUDES=""
-#          for file in $FILES; do
-#              INCLUDES="$INCLUDES --include $file"
-#          done
-#          echo "$INCLUDES"
-#          echo "INCLUDED_DAGS=$INCLUDES" >> "$GITHUB_OUTPUT"
-          
-
-#      - name: Sync Updated DAGS
-#        if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
-#        run: |
-#           FILES="$(echo ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }} | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}')"
-#           echo "Syncing updated files: $FILES"
-#           echo "${FILES[@]/#/--include }"
+          INCLUDES=""
+          for file in $FILES; do
+              INCLUDES="$INCLUDES --include $file"
+          done
+          echo "$INCLUDES"
+          echo "INCLUDED_DAGS=$INCLUDES" >> "$GITHUB_OUTPUT"
 
       - name: Sync Updated DAGS
         if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
         run: |
            FILES="${{ steps.get-deleted-dags.outputs.INCLUDED_DAGS }}"
            echo "Syncing updated files: $FILES"
-           echo "${FILES[@]/#/--include }"
           
         
                     
