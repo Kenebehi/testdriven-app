@@ -23,7 +23,7 @@ jobs:
         run: |
           echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
           SERVICES="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          FILES=$(echo $PATHS | tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')
+          FILES="$(echo $PATHS | tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
           echo $FILES
 
           INCLUDES=""
