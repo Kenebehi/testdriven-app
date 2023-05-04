@@ -51,7 +51,7 @@ jobs:
           echo "INCLUDED_DAGS=$INCLUDES" >> "$GITHUB_OUTPUT"
           
 
-      - name: Sync Deleted Or Renamed DAGS
+      - name: Get Deleted Or Renamed DAGS
         id: get-deleted-renamed-dags
         env:
           S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
@@ -67,10 +67,10 @@ jobs:
           echo "$EXCLUDES"
           echo "$EXCLUDED_DAGS=$EXCLUDES" >> "$GITHUB_OUTPUT"         
 
-      - name: Sync Updated DAGS
+      - name: Sync DAGS
         run: |
           if: ${{ steps.get-changed-dags.outputs.EXCLUDED_DAGS != '' }}
-            echo "aws s3 rm ${{ steps.get-changed-dags.outputs.$EXCLUDED_DAGS }}"
+            echo "aws s3 rm ${{ steps.get-deleted-renamed-dags.outputs.$EXCLUDED_DAGS }}"
           fi
           
           if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
