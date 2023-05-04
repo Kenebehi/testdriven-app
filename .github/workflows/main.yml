@@ -49,7 +49,7 @@ jobs:
           echo "$include"
           echo "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
           
-          echo aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" $(basename $include)
+          echo aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" "$(basename $include)"
 
           
 
