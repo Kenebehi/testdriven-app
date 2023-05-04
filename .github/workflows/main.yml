@@ -21,10 +21,9 @@ jobs:
           files: |
             airflow/dags/**
 
-#      # Re-sync from master to s3 affected by this PR.
-#      - name: Re-sync affected DAGs
-#        run: |
-#          echo "${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}"
-#          for file in ${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}; do
-#            echo 'aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" --include "**$(basename $file)"'
-#          done
+      - name: Re-sync affected DAGs
+        run: |
+          echo "${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}"
+          for file in ${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}; do
+            echo 'aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" --include "**$(basename $file)"'
+          done
