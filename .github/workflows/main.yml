@@ -22,7 +22,7 @@ jobs:
             airflow/dags/**
 
       - name: Get changed files in Configurations
-        id: updated-dags-files
+        id: updated-configuration-files
         uses: tj-actions/changed-files@v35
         with:
           base_sha: "${{ github.event.workflow_run.head_sha }}"
@@ -30,7 +30,7 @@ jobs:
             settings/**
 
       - name: Get changed files for DAG Utils
-        id: changed-dags-files
+        id: updated-utils-files
         uses: tj-actions/changed-files@v35
         with:
           base_sha: "${{ github.event.workflow_run.head_sha }}"
