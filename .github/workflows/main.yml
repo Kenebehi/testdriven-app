@@ -57,7 +57,7 @@ jobs:
           S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
         run: |
           DELETED_RENAMED_FILES="$${{ steps.get-renamed-files.outputs.RENAMED_FILES }} $${{ steps.get-deleted-files.outputs.DELETED_FILES }}"
-          FILES="$(echo DELETED_RENAMED_FILES | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
+          FILES="$(echo $DELETED_RENAMED_FILES | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
           echo "$FILES"
           
           EXCLUDES=""
