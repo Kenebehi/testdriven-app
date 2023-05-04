@@ -45,7 +45,8 @@ jobs:
           for file in $files; do
             include="$include --include $file"
           done
-          echo $include
+          echo "the files: $files"
+          echo "$include"
           
           echo aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" $include
 
