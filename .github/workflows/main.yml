@@ -68,7 +68,7 @@ jobs:
           echo "REMOVED_DAGS=$DAGS_TO_DELETE" >> "$GITHUB_OUTPUT"
 
       - name: Sync Renamed and Deleted DAG's
-        if: ${{ steps.get-changed-dags.outputs.REMOVED_DAGS != '' }}
+        if: ${{ steps.get-deleted-renamed-dags.REMOVED_DAGS != '' }}
         run: |
             echo "aws s3 rm ${{ steps.get-deleted-renamed-dags.outputs.REMOVED_DAGS }}"
 
