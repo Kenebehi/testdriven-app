@@ -38,15 +38,17 @@ jobs:
             utils/dag_utils/**
 
       - name: Sync Only Updated DAGs
+        if: ${{ steps.changed-dags-files.outputs.all_changed_and_modified_files !=0 }}
         run: |
-          echo "${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}"
+          
     
           include=""
-          for file in "${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}"; do
+          for file in "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"; do
             include="$include --include $file"
           done
           echo "the files: $files"
           echo "$include"
+          echo "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
           
           echo aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" $include
 
