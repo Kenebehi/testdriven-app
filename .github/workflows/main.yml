@@ -39,6 +39,8 @@ jobs:
 
       - name: Sync Only Updated DAGs
         if: ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files !=0 }}
+        env:
+          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
         run: |
           
           include=""
@@ -49,10 +51,7 @@ jobs:
           echo "$include"
           echo "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
           
-          echo aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*"  $include
+          echo aws s3 sync ./airflow/dags/ $S3_AIRFLOW_DIR/staging/dags/ --exclude "*"  $include;
+          echo aws s3 sync ./airflow/dags/ $S3_AIRFLOW_DIR/live/dags/ --exclude "*"  $include;
+          echo aws s3 sync ./airflow/dags/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/dags/ --exclude "*"  $include;
 
-          
-
-#          for file in ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}; do
-#            echo aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" --include $(basename $file)
-#          done
