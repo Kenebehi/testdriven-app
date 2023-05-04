@@ -13,110 +13,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get All Updated Files Names
-        id: get-changed-files
-        run: |
-          message=$(git diff --name-only -r HEAD^1 HEAD )
-          message=$(echo $message | tr '\n' ' ')
-          echo "EDITED_FILES=$message" >> "$GITHUB_OUTPUT"
+      - name: Get changed files for Airflow Staging DAGs
+        id: changed-dags-files
+        uses: tj-actions/changed-files@v35
+        with:
+          base_sha: "${{ github.event.workflow_run.head_sha }}"
+          files: |
+            airflow/staging/**
 
-      - name: Get All Deleted Files Names
-        id: get-deleted-files
+      # Re-sync from master to s3 affected by this PR.
+      - name: Re-sync affected DAGs
         run: |
-          message=$(git diff --diff-filter=D --name-only HEAD^ HEAD )
-          message=$(echo $message | tr '\n' ' ')
-          echo "DELETED_FILES=$message" >> "$GITHUB_OUTPUT"
-
-      - name: Get Renamed Files Names
-        id: get-renamed-files
-        run: |
-          message=$(git diff --name-status HEAD^1 HEAD | grep -E '^R' | awk '{print $2}')
-          message=$(echo $message | tr '\n' ' ')
-          echo "RENAMED_FILES=$message" >> "$GITHUB_OUTPUT"
-
-      - name: Get All Updated DAGS
-        id: get-changed-dags
-        run: |
-          EDITED_FILES_LIST="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
-          echo "$FILES"
-          
-          INCLUDES=""
-          for file in $FILES; do
-              INCLUDES="$INCLUDES --include $file"
+          echo "${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}"
+          for file in ${{ steps.changed-dags-files.outputs.all_changed_and_modified_files }}; do
+            echo 'aws s3 sync --delete airflow/dags/ s3://xxx/dags/staging/ --exclude "*" --include "**$(basename $file)"'
           done
-          echo "$INCLUDES"
-          echo "INCLUDED_DAGS=$INCLUDES" >> "$GITHUB_OUTPUT"
-
-#      - name: Get Updated Configuration File Names
-#        id: get-updated-configurations
-#        run: |
-#          EDITED_CONFS="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-#          FILES="$(echo $EDITED_CONFS | sed 's/setting\///g'  | tr '\n' ' ')"
-#          echo "$FILES"
-#
-#          INCLUDES=""
-#          for file in $FILES; do
-#              INCLUDES="$INCLUDES --include $file"
-#          done
-#          echo "$INCLUDES"
-#          echo "INCLUDED_CONFIGURATIONS=$INCLUDES" >> "$GITHUB_OUTPUT"
-
-
-#      - name: Get Deleted Or Renamed Configurations
-#        id: get-deleted-renamed-configurations
-#        env:
-#          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
-#        run: |
-#          DELETED_RENAMED_CONFIG_FILES="${{ steps.get-renamed-files.outputs.RENAMED_FILES }} ${{ steps.get-deleted-files.outputs.DELETED_FILES }}"
-#          FILES="$(echo DELETED_RENAMED_CONFIG_FILES | tr ' ' '\n' | grep "settings/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
-#          echo "this is my expected output $FILES"
-#
-#          CONFS_TO_DELETE=""
-#          for file in $FILES; do
-#              CONFS_TO_DELETE="$CONFS_TO_DELETE $S3_AIRFLOW_DIR/$file"
-#          done
-#          echo "$CONFS_TO_DELETE"
-#          echo "REMOVED_DAGS=$CONFS_TO_DELETE" >> "$GITHUB_OUTPUT"
-          
-
-      - name: Get Deleted Or Renamed DAGS
-        id: get-deleted-renamed-dags
-        env:
-          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
-        run: |
-          DELETED_RENAMED_FILES="${{ steps.get-renamed-files.outputs.RENAMED_FILES }} ${{ steps.get-deleted-files.outputs.DELETED_FILES }}"
-          FILES="$(echo $DELETED_RENAMED_FILES | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
-          echo "this is my expected output $FILES"
-          
-          DAGS_TO_DELETE=""
-          for file in $FILES; do
-              DAGS_TO_DELETE="$DAGS_TO_DELETE $S3_AIRFLOW_DIR/$file"
-          done
-          echo "$DAGS_TO_DELETE"
-          echo "REMOVED_DAGS=$DAGS_TO_DELETE" >> "$GITHUB_OUTPUT"
-
-      - name: Sync Renamed and Deleted File
-        run: |
-          my_function() {
-            echo "Hello, $1! $2"
-            if ${{ steps.$1.outputs.$2 != '' }}
-                echo "aws s3 rm ${{ steps.$1.outputs.$2 }}"
-            fi
-          }
-
-      - name: Call function
-        run: |
-          # Call the function with a parameter
-          my_function "get-changed-dags" "INCLUDED_DAGS"
-
-
-#      - name: Sync Updated DAG
-#        if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
-#        run: |
-#            echo "aws s3 sync ./airflow/dags/ s3://mesh-pa-consumer-private/kenneth_odumah/dags/ ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }}"
-#
-#      - name: Sync Updated Configuration Files
-#        if: ${{ steps.get-updated-configurations.outputs.INCLUDED_CONFIGURATIONS != '' }}
-#        run: |
-#            echo "aws s3 sync ./settings/ s3://mesh-pa-consumer-private/kenneth_odumah/settings/ ${{ steps.get-changed-dags.outputs.INCLUDED_CONFIGURATIONS }}"
