@@ -68,11 +68,12 @@ jobs:
           echo "REMOVED_DAGS=$DAGS_TO_DELETE" >> "$GITHUB_OUTPUT"
 
       - name: Sync DAGS
+        shell: bash
         run: |
           if: ${{ steps.get-changed-dags.outputs.REMOVED_DAGS != '' }}
             echo "aws s3 rm ${{ steps.get-deleted-renamed-dags.outputs.REMOVED_DAGS }}"
           fi
-
+  
           if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
             echo "aws s3 sync ./airflow/dags/ s3://mesh-pa-consumer-private/kenneth_odumah/dags/ ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }}"
           fi
