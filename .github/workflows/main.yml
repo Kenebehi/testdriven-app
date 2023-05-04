@@ -37,7 +37,7 @@ jobs:
           files: |
             utils/dag_utils/**
 
-      - name: Sync Only Updated DAGs
+      - name: Sync DAGs
         if: ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files !=0 }}
         env:
           S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
@@ -50,22 +50,40 @@ jobs:
 
           echo "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
           
-          echo aws s3 sync ./airflow/dags/ $S3_AIRFLOW_DIR/staging/dags/ --exclude "*"  $include;
-          echo aws s3 sync ./airflow/dags/ $S3_AIRFLOW_DIR/live/dags/ --exclude "*"  $include;
-          echo aws s3 sync ./airflow/dags/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/dags/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/staging/dags/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/live/dags/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/dags/ --exclude "*"  $include;
 
-#      - name: Revert Commits on Failure
-#        if: failure()
-#        run: |
-#          # Get the SHA of the last commit
-#          last_commit=$(git rev-parse HEAD)
-#
-#          # Revert all commits since the first commit
-#          git revert --no-commit HEAD~$(git rev-list --count HEAD ^$(git merge-base main $last_commit) HEAD)
-#
-#          # Commit the changes
-#          git commit -m "Revert all changes since the last successful build"
-#
-#          # Push the changes back to the branch
-#          git push origin main
+      - name: Sync DAG_UTILS
+        if: ${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files !=0 }}
+        env:
+          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
+        run: |
+          
+          include=""
+          for file in "${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files }}"; do
+            include="$include --include $(expr $file : '[^/]*/\(.*\)')"
+          done
 
+          echo "${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files }}"
+          
+          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/staging/dags/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/live/dags/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/dags/ --exclude "*"  $include;
+
+      - name: Sync Settings
+        if: ${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files !=0 }}
+        env:
+          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
+        run: |
+          
+          include=""
+          for file in "${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"; do
+            include="$include --include $(expr $file : '[^/]*/\(.*\)')"
+          done
+
+          echo "${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files }}"
+          
+          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/staging/dags/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/live/dags/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/dags/ --exclude "*"  $include;
