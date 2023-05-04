@@ -56,9 +56,9 @@ jobs:
 #           echo "${FILES[@]/#/--include }"
 
       - name: Sync Updated DAGS
-        if: ${{ steps.get-changed-files.outputs.EDITED_FILES != '' }}
+        if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
         run: |
-           FILES="$(echo ${{ steps.get-changed-files.outputs.EDITED_FILES }} | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}')"
+           FILES="${{ steps.get-deleted-dags.outputs.INCLUDED_DAGS }}"
            echo "Syncing updated files: $FILES"
            echo "${FILES[@]/#/--include }"
           
