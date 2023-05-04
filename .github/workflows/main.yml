@@ -27,10 +27,15 @@ jobs:
           message=$(echo $message | tr '\n' ' ')
           echo "DELETED_FILES=$message" >> "$GITHUB_OUTPUT"
 
-      - name: Get All Changed DAGS
+      - name: Get All Renamed Files
+        id: get-renamed-files
+        run: |
+          message=$(git diff --name-status HEAD^1 HEAD | grep -E '^R')
+          message=$(echo $message | tr '\n' ' ')
+          echo "RENAMED_FILES=$message" >> "$GITHUB_OUTPUT"
+
+      - name: Get All Updated DAGS
         id: get-changed-dags
-        env:
-          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
         run: |
           echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
           echo "The deleted files is ${{ steps.get-deleted-files.outputs.DELETED_FILES }}"
@@ -38,18 +43,39 @@ jobs:
           FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
           echo "$FILES"
           
-
           INCLUDES=""
           for file in $FILES; do
               INCLUDES="$INCLUDES --include $file"
           done
           echo "$INCLUDES"
           echo "INCLUDED_DAGS=$INCLUDES" >> "$GITHUB_OUTPUT"
+          
+
+      - name: Sync Deleted Or Renamed DAGS
+        id: get-deleted-renamed-dags
+        env:
+          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
+        run: |
+          DELETED_RENAMED_FILES="$${{ steps.get-renamed-files.outputs.RENAMED_FILES }} $${{ steps.get-deleted-files.outputs.DELETED_FILES }}"
+          FILES="$(echo DELETED_RENAMED_FILES | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
+          echo "$FILES"
+          
+          EXCLUDES=""
+          for file in $FILES; do
+              EXCLUDES="$EXCLUDES $S3_AIRFLOW_DIR/$file"
+          done
+          echo "$EXCLUDES"
+          echo "$EXCLUDED_DAGS=$EXCLUDES" >> "$GITHUB_OUTPUT"         
 
       - name: Sync Updated DAGS
-        if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
         run: |
-           echo "aws s3 sync ./airflow/dags/ s3://mesh-pa-consumer-private/kenneth_odumah/dags/ --exclude "*"  ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }}"
+          if: ${{ steps.get-changed-dags.outputs.EXCLUDED_DAGS != '' }}
+            echo "aws s3 rm ${{ steps.get-changed-dags.outputs.$EXCLUDED_DAGS }}"
+          fi
+          
+          if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
+            echo "aws s3 sync ./airflow/dags/ s3://mesh-pa-consumer-private/kenneth_odumah/dags/ ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }}"
+          fi
           
         
                     
