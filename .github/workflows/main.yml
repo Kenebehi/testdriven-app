@@ -13,21 +13,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get All Changed Files
+      - name: Get All Updated Files Names
         id: get-changed-files
         run: |
           message=$(git diff --name-only -r HEAD^1 HEAD )
           message=$(echo $message | tr '\n' ' ')
           echo "EDITED_FILES=$message" >> "$GITHUB_OUTPUT"
 
-      - name: Get All Deleted Files
+      - name: Get All Deleted Files Names
         id: get-deleted-files
         run: |
           message=$(git diff --diff-filter=D --name-only HEAD^ HEAD )
           message=$(echo $message | tr '\n' ' ')
           echo "DELETED_FILES=$message" >> "$GITHUB_OUTPUT"
 
-      - name: Get All Renamed Files
+      - name: Get Renamed Files Names
         id: get-renamed-files
         run: |
           message=$(git diff --name-status HEAD^1 HEAD | grep -E '^R' | awk '{print $2}')
@@ -37,8 +37,6 @@ jobs:
       - name: Get All Updated DAGS
         id: get-changed-dags
         run: |
-          echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          echo "The deleted files is ${{ steps.get-deleted-files.outputs.DELETED_FILES }}"
           EDITED_FILES_LIST="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
           FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
           echo "$FILES"
@@ -49,6 +47,21 @@ jobs:
           done
           echo "$INCLUDES"
           echo "INCLUDED_DAGS=$INCLUDES" >> "$GITHUB_OUTPUT"
+
+      - name: Get Updated Configuration File Names
+        id: get-updated-configurations
+        run: |
+          EDITED_CONF="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
+          FILES="$(echo $EDITED_FILES_LIST | tr ' ' '\n' | grep "settings/.*\.yml" | awk -F/ '{print $NF}' | tr '\n' ' ')"
+          FILES="$(echo $EDITED_FILES_LIST | sed 's/setting\///g'  | tr '\n' ' ')"
+          echo "$FILES"
+          
+          INCLUDES=""
+          for file in $FILES; do
+              INCLUDES="$INCLUDES --include $file"
+          done
+          echo "$INCLUDES"
+          echo "INCLUDED_CONFIGURATIONS=$INCLUDES" >> "$GITHUB_OUTPUT"
           
 
       - name: Get Deleted Or Renamed DAGS
@@ -76,3 +89,8 @@ jobs:
         if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
         run: |
             echo "aws s3 sync ./airflow/dags/ s3://mesh-pa-consumer-private/kenneth_odumah/dags/ ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }}"
+
+      - name: Sync Updated Configuration Files
+        if: ${{ steps.get-updated-configurations.outputs.INCLUDED_CONFIGURATIONS != '' }}
+        run: |
+            echo "aws s3 sync ./settings/ s3://mesh-pa-consumer-private/kenneth_odumah/settings/ ${{ steps.get-changed-dags.outputs.INCLUDED_CONFIGURATIONS }}"
