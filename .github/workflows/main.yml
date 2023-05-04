@@ -46,8 +46,6 @@ jobs:
 
       - name: Get Files
         run: |
-          echo "The selected files is ${{ steps.get-changed-files.outputs.EDITED_FILES }}"
-          echo "The selected files is ${{ steps.get-changed-files.outputs.DELETED_FILES }}"
           SERVICES="${{ steps.get-changed-files.outputs.EDITED_FILES }}"
           FILES="$(echo $SERVICES | tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
           echo $FILES
