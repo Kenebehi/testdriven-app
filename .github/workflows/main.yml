@@ -55,3 +55,18 @@ jobs:
           echo aws s3 sync ./airflow/dags/ $S3_AIRFLOW_DIR/live/dags/ --exclude "*"  $include;
           echo aws s3 sync ./airflow/dags/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/dags/ --exclude "*"  $include;
 
+#      - name: Revert Commits on Failure
+#        if: failure()
+#        run: |
+#          # Get the SHA of the last commit
+#          last_commit=$(git rev-parse HEAD)
+#
+#          # Revert all commits since the first commit
+#          git revert --no-commit HEAD~$(git rev-list --count HEAD ^$(git merge-base main $last_commit) HEAD)
+#
+#          # Commit the changes
+#          git commit -m "Revert all changes since the last successful build"
+#
+#          # Push the changes back to the branch
+#          git push origin main
+
