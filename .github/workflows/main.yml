@@ -62,7 +62,7 @@ jobs:
           
           DAGS_TO_DELETE=""
           for file in $FILES; do
-              DAGS_TO_DELETE=$DAGS_TO_DELETE $S3_AIRFLOW_DIR/$file"
+              DAGS_TO_DELETE="$DAGS_TO_DELETE $S3_AIRFLOW_DIR/$file"
           done
           echo "$DAGS_TO_DELETE"
           echo "$REMOVED_DAGS=$DAGS_TO_DELETE" >> "$GITHUB_OUTPUT"
