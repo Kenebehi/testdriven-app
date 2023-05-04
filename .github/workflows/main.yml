@@ -60,22 +60,22 @@ jobs:
           FILES="$(echo $DELETED_RENAMED_FILES | tr ' ' '\n' | grep "airflow/dags/.*\.py" | awk -F/ '{print $NF}' | tr '\n' ' ')"
           echo "$FILES"
           
-          EXCLUDES=""
-          for file in $FILES; do
-              EXCLUDES="$EXCLUDES $S3_AIRFLOW_DIR/$file"
-          done
-          echo "$EXCLUDES"
-          echo "$EXCLUDED_DAGS=$EXCLUDES" >> "$GITHUB_OUTPUT"         
+#          EXCLUDES=""
+#          for file in $FILES; do
+#              EXCLUDES="$EXCLUDES $S3_AIRFLOW_DIR/$file"
+#          done
+#          echo "$EXCLUDES"
+#          echo "$EXCLUDED_DAGS=$EXCLUDES" >> "$GITHUB_OUTPUT"
 
-      - name: Sync DAGS
-        run: |
-          if: ${{ steps.get-changed-dags.outputs.EXCLUDED_DAGS != '' }}
-            echo "aws s3 rm ${{ steps.get-deleted-renamed-dags.outputs.EXCLUDED_DAGS }}"
-          fi
-          
-          if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
-            echo "aws s3 sync ./airflow/dags/ s3://mesh-pa-consumer-private/kenneth_odumah/dags/ ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }}"
-          fi
+#      - name: Sync DAGS
+#        run: |
+#          if: ${{ steps.get-changed-dags.outputs.EXCLUDED_DAGS != '' }}
+#            echo "aws s3 rm ${{ steps.get-deleted-renamed-dags.outputs.EXCLUDED_DAGS }}"
+#          fi
+#
+#          if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
+#            echo "aws s3 sync ./airflow/dags/ s3://mesh-pa-consumer-private/kenneth_odumah/dags/ ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }}"
+#          fi
           
         
                     
