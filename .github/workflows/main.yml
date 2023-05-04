@@ -68,7 +68,7 @@ jobs:
           echo "REMOVED_DAGS=$DAGS_TO_DELETE" >> "$GITHUB_OUTPUT"
 
       - name: Sync Renamed and Deleted DAG's
-        if: ${{ steps.get-deleted-renamed-dags.REMOVED_DAGS != '' }}
+        if: ${{ steps.get-deleted-renamed-dags.outputs.REMOVED_DAGS != '' }}
         run: |
             echo "aws s3 rm ${{ steps.get-deleted-renamed-dags.outputs.REMOVED_DAGS }}"
 
@@ -76,88 +76,3 @@ jobs:
         if: ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS != '' }}
         run: |
             echo "aws s3 sync ./airflow/dags/ s3://mesh-pa-consumer-private/kenneth_odumah/dags/ ${{ steps.get-changed-dags.outputs.INCLUDED_DAGS }}"
-
-          
-        
-                    
-
-
-
-      #     aws s3 sync ./workers s3://your-bucket-name --exclude "*" $INCLUDES
-
-
-# name: Sync Changed Files with AWS S3
-
-# on:
-#   push:
-#     branches: [abranch]
-
-# jobs:
-#   sync-files:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout repo
-#         uses: actions/checkout@v2
-
-#       - name: Get Changed Files
-#         id: get-changed-files
-#         run: |
-#           echo "EDITED_FILES=$(git diff --name-only -r HEAD^1 HEAD)" >> "$GITHUB_ENV"
-#           echo "DELETED_FILES=$(git diff --diff-filter=D --name-only HEAD^ HEAD)" >> "$GITHUB_ENV"
-
-#       - name: Sync Updated Files
-#         if: ${{ steps.get-changed-files.outputs.EDITED_FILES != '' }}
-#         run: |
-#           FILES="$(echo ${{ steps.get-changed-files.outputs.EDITED_FILES }} | tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}')"
-#           echo "Syncing updated files: $FILES"
-#           aws s3 sync ./workers s3://your-bucket/workers/ --exclude "*" ${FILES[@]/#/--include }
-
-#       - name: Delete Removed Files
-#         if: ${{ steps.get-changed-files.outputs.DELETED_FILES != '' }}
-#         run: |
-#           FILES="$(echo ${{ steps.get-changed-files.outputs.DELETED_FILES }} | tr ' ' '\n' | grep "services/.*\.py" | awk -F/ '{print $NF}')"
-#           echo "Deleting removed files: $FILES"
-#           aws s3 rm s3://your-bucket/workers/ ${FILES[@]/#/--exclude } --recursive
-
-
-# name: Echo Changed Files
-
-# on:
-#   push:
-#     branches: [abranch]
-
-# jobs:
-#   echo-files:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout repo
-#         uses: actions/checkout@v3
-#         with:
-#           fetch-depth: 0
-
-#       - name: Get Changed Files
-#         id: get-changed-files
-#         run: |
-#           git diff --name-only -r HEAD^1 HEAD > edited_files.txt
-#           echo "EDITED_FILES=$(cat edited_files.txt | tr '\n' ' ')" >> "$GITHUB_ENV"
-
-#       - name: Get Deleted Files
-#         id: get-deleted-files
-#         run: |
-#           git diff --diff-filter=D --name-only HEAD^ HEAD > deleted_files.txt
-#           echo "DELETED_FILES=$(cat deleted_files.txt | tr '\n' ' ')" >> "$GITHUB_ENV"
-
-#       - name: Get Files
-#         run: |
-#           edited_files=($EDITED_FILES)
-#           deleted_files=($DELETED_FILES)
-
-#           # Filter files by folder
-#           FILES=$(printf '%s\n' "${edited_files[@]}" "${deleted_files[@]}" | grep -E '^(dags|tests)/.*\.py$' | awk -F/ '{print $NF}' | tr '\n' ' ')
-#           echo "The selected files are: $FILES"
-
-#           INCLUDES=""
-#           for path in $FILES; do
-#             INCLUDES+=" --include $path"
-#           done
-#           echo "INCLUDES=$INCLUDES" >> "$GITHUB_ENV"
