@@ -78,7 +78,7 @@ jobs:
           updated_config_files="${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"
           
 
-          for file in updated_config_files; do
+          for file in $updated_config_files; do
             write_s3_path="$(dirname ${file#*/})"
             echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/staging/$write_s3_path/ --exclude "*" --include $(basename $file);
             echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/live/$write_s3_path/ --exclude "*"  --include $(basename $file);
