@@ -95,10 +95,8 @@ jobs:
           
           include=""
           for file in "${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"; do
-            include="$include --include ${file#*/}"
+            include="$include --include $(echo $file | sed 's/^[^\/]*\///')"
           done
-
-          echo "${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"
           
           echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/staging/settings/ --exclude "*"  $include;
           echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/live/settings/ --exclude "*"  $include;
