@@ -60,11 +60,14 @@ jobs:
         run: >
           
           updated_util_files="${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files }}"
+          
 
           for file in $updated_util_files; do
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/staging/$(dirname ${file#*/})/ --exclude "*" --include $(basename $file);
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/live/$(dirname ${file#*/})/ --exclude "*"  --include $(basename $file);
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/$(dirname ${file#*/})/ --exclude "*"  --include $(basename $file);
+            write_s3_path="$(basename $(dirname $file))"
+          
+            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/staging/$write_s3_path/ --exclude "*" --include $(basename $file);
+            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/live/$write_s3_path/ --exclude "*"  --include $(basename $file);
+            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/$write_s3_path/ --exclude "*"  --include $(basename $file);
           done
       - name: Sync DAG Configuration
         if: ${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files !=0 }}
@@ -73,9 +76,11 @@ jobs:
         run: >
           
           updated_config_files="${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"
+          
 
           for file in updated_config_files; do
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/staging/$(dirname ${file#*/})/ --exclude "*" --include $(basename $file);
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/live/$(dirname ${file#*/})/ --exclude "*"  --include $(basename $file);
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/$(dirname ${file#*/})/ --exclude "*"  --include $(basename $file);
+            write_s3_path="$(dirname ${file#*/})"
+            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/staging/$write_s3_path/ --exclude "*" --include $(basename $file);
+            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/live/$write_s3_path/ --exclude "*"  --include $(basename $file);
+            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/$write_s3_path/ --exclude "*"  --include $(basename $file);
           done
