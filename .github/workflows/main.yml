@@ -76,11 +76,12 @@ jobs:
           S3_AIRFLOW_DIR: s3://mesh-pa-consumer-private/kenneth_odumah
         run: |
           
+          $updated_config_files="${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"
           include=""
-          for file in "${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"; do
-            include="$include --include $(echo $file | sed 's/^[^\/]*\///')"
+          for file in $updated_config_files; do
+            include="$include --include ${file#*/}"
           done
-          echo "${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"
+          echo "$updated_config_files"
           echo "$include"
           
           echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/staging/settings/ --exclude "*"  $include;
