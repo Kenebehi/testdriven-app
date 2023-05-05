@@ -27,7 +27,7 @@ jobs:
         with:
           base_sha: "${{ github.event.workflow_run.head_sha }}"
           files: |
-            settings/**
+            airflow/settings/**
 
       - name: Get Updated files for DAG Utils
         id: updated-dag-utils-files
@@ -35,7 +35,7 @@ jobs:
         with:
           base_sha: "${{ github.event.workflow_run.head_sha }}"
           files: |
-            utils/dag_utils/**
+            airflow/utils/dag_utils/**
 
       - name: Sync DAGs
         if: ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files !=0 }}
@@ -100,6 +100,6 @@ jobs:
 
           echo "${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"
           
-          echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/staging/ --exclude "*"  $include;
-          echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/live/ --exclude "*"  $include;
-          echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/staging/settings/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/live/settings/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/settings/ --exclude "*"  $include;
