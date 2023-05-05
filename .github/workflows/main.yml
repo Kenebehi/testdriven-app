@@ -76,7 +76,7 @@ jobs:
           S3_AIRFLOW_DIR: s3://mesh-pa-consumer-private/kenneth_odumah
         run: |
           
-          $updated_config_files="${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"
+          updated_config_files="${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"
           include=""
           for file in $updated_config_files; do
             include="$include --include ${file#*/}"
