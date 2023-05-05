@@ -79,9 +79,9 @@ jobs:
     
           include=""
           for file in "${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files }}"; do
-            include="$include --include $(basename "$(dirname "$file")")/$(basename "$file")"
+            include="$include --include ${file#*/}"
           done
-          echo $include
+          echo "$include"
           
           echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/staging/ --exclude "*"  $include;
           echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/live/ --exclude "*"  $include;
