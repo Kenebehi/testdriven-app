@@ -54,27 +54,43 @@ jobs:
           echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/live/dags/ --exclude "*"  $include;
           echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/dags/ --exclude "*"  $include;
 
-      - name: Sync DAG_UTILS
-        if: ${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files !=0 }}
+      - name: Sync DAGs
+        if: ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files !=0 }}
         env:
-          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
+          S3_AIRFLOW_DIR: s3://mesh-pa-consumer-private/kenneth_odumah
         run: |
           
           include=""
-          for file in "${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files }}"; do
-            include="$include --include $(expr $file : '[^/]*/\(.*\)')"
+          for file in "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"; do
+            include="$include --include $(basename $file)"
           done
 
-          echo "${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files }}"
+          echo "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
           
           echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/staging/dags/ --exclude "*"  $include;
           echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/live/dags/ --exclude "*"  $include;
           echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/dags/ --exclude "*"  $include;
 
-      - name: Sync Settings
+      - name: Sync DAG_UTILS
+        if: ${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files !=0 }}
+        env:
+          S3_AIRFLOW_DIR: s3://mesh-pa-consumer-private/kenneth_odumah
+        run: |
+    
+          include=""
+          for file in "${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files }}"; do
+            include="$include --include $(basename "$(dirname "$file")")/$(basename "$file")"
+          done
+          echo $include
+          
+          echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/staging/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/live/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/ --exclude "*"  $include;
+
+      - name: Sync DAG Configuration
         if: ${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files !=0 }}
         env:
-          S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
+          S3_AIRFLOW_DIR: s3://mesh-pa-consumer-private/kenneth_odumah
         run: |
           
           include=""
@@ -82,8 +98,8 @@ jobs:
             include="$include --include $(expr $file : '[^/]*/\(.*\)')"
           done
 
-          echo "${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files }}"
+          echo "${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"
           
-          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/staging/dags/ --exclude "*"  $include;
-          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/live/dags/ --exclude "*"  $include;
-          echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/dags/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/staging/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/live/ --exclude "*"  $include;
+          echo aws s3 sync --delete ./airflow/settings/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/ --exclude "*"  $include;
