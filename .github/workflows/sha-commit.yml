@@ -14,14 +14,12 @@
       steps:
         - name: Checkout repo
           uses: actions/checkout@v3
-          with:
-            fetch-depth: 2
   
         - name: Get changed Airflow  DAG's
           id: updated-dags-files
           uses: tj-actions/changed-files@v35
           with:
-            since_last_remote_commit: true
+            base_sha: "14237119bd19bbf12e9ae6ce861b26fc5fc787cf"
             files: |
               airflow/dags/**
   
