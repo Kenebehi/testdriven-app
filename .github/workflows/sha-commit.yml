@@ -21,12 +21,13 @@
           run: |
               PREV_SHA=$(git rev-parse HEAD~1)
               echo "Previous SHA: $PREV_SHA"
+              echo "::set-env name=PREV::$PREV_SHA"
   
         - name: Get changed Airflow  DAG's
           id: updated-dags-files
           uses: tj-actions/changed-files@v35
           with:
-            base_sha: "${{ github.event.workflow_run.head_sha }}"
+            base_sha: "$PREV"
             files: |
               airflow/dags/**
   
@@ -39,13 +40,4 @@
           run: |
             
             updated_dag_files="${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
-            include=""
-            for file in $updated_dag_files; do
-              include="$include --include $(basename $file)"
-            done
-  
-            echo "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
-            
-            aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/staging/dags/ --exclude "*"  $include;
-            aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/live/dags/ --exclude "*"  $include;
-            aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/dags/ --exclude "*"  $include;
+            echo $updated_dag_files
