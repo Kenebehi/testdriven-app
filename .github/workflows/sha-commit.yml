@@ -16,7 +16,7 @@
           uses: actions/checkout@v3
 
         - name: Print event payload
-          run: echo "${{ toJson(github.event) }}"
+          run: echo "${{ github.event.release.head.sha }}"
 
 
         # - name: Get changed Airflow  DAG's
