@@ -3,7 +3,7 @@ name: Echo Changed Files
 on:
   push:
     branches:
-      - Kenebehi-workflow
+      - dec
 jobs:
   echo-files:
     runs-on: ubuntu-latest
