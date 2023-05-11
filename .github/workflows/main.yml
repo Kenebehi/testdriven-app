@@ -1,38 +1,27 @@
 ---
-name: sync files after publish
-
+name: Echo Changed Files
 on:
-  release:
-    types:
-      - published
-
+  push:
+    branches:
+      - Kenebehi-workflow
 jobs:
   echo-files:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 3
 
-      - name: Get Staging DAGs 
+      - name: Get changed files for Airflow Staging DAGs
         id: updated-dags-files
         uses: tj-actions/changed-files@v35
         with:
+          base_sha: ${{ github.event.pull_request.head.sha }}
           files: |
             airflow/dags/**
 
-      - name: Get Configuration files
-        id: updated-configuration-files
-        uses: tj-actions/changed-files@v35
-        with:
-          files: |
-            airflow/settings/**
 
-      - name: Get DAG Utils files
-        id: updated-dag-utils-files
-        uses: tj-actions/changed-files@v35
-        with:
-          files: |
-            airflow/utils/dag_utils/**
       - name: Sync DAGs
         if: ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files !=0 }}
         env:
@@ -49,35 +38,3 @@ jobs:
           echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/staging/dags/ --exclude "*"  $include;
           echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/live/dags/ --exclude "*"  $include;
           echo aws s3 sync --delete ./airflow/dags/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/dags/ --exclude "*"  $include;
-
-      - name: Sync DAG_UTILS
-        if: ${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files !=0}}
-        env:
-          S3_AIRFLOW_DIR: s3://mesh-pa-consumer-private/kenneth_odumah
-        run: >
-          
-          updated_util_files="${{ steps.updated-dag-utils-files.outputs.all_changed_and_modified_files }}"
-          
-
-          for file in $updated_util_files; do
-            write_s3_path="$(basename $(dirname $file))"
-          
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/staging/$write_s3_path/ --exclude "*" --include $(basename $file);
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/live/$write_s3_path/ --exclude "*"  --include $(basename $file);
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/$write_s3_path/ --exclude "*"  --include $(basename $file);
-          done
-      - name: Sync DAG Configuration
-        if: ${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files !=0 }}
-        env:
-          S3_AIRFLOW_DIR: s3://mesh-pa-consumer-private/kenneth_odumah
-        run: >
-          
-          updated_config_files="${{ steps.updated-configuration-files.outputs.all_changed_and_modified_files }}"
-          
-
-          for file in $updated_config_files; do
-            write_s3_path="$(dirname ${file#*/})"
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/staging/$write_s3_path/ --exclude "*" --include $(basename $file);
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/live/$write_s3_path/ --exclude "*"  --include $(basename $file);
-            echo aws s3 sync --delete ./airflow/utils/dag_utils/ $S3_AIRFLOW_DIR/${{ github.event.release.tag_name }}/$write_s3_path/ --exclude "*"  --include $(basename $file);
-          done

@@ -2,7 +2,12 @@ name: Master build
 
 # raise pr -> runs pr-checks.yml
 # merge with master -> runs master-build.yml
-### release -> runs sync-s3-dags.yaml
+### release -> |
+#      runs sync-s3-dags.yaml
+#
+#
+#
+#
 # manual intervention
 ### on workflow_dispatch -> runs sync-s3-dags-[staging/manually].yaml
 
@@ -33,25 +38,8 @@ jobs:
       # get aws details
       # sync dq files
       
-      # - name: release
-      #   env:
-      #     GH_TOKEN: ${{ github.token }}
-      #   run: |
-      #     gh release create v1.0.1 --title test --generate-notes
-
-
-
-      - name: Install GitHub CLI
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - run: |
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-          sudo apt-add-repository https://cli.github.com/packages
-          sudo apt update
-          sudo apt install gh
-      - name: Create release
+      - name: release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create ${{ github.ref }} \
-            --title "Release ${{ github.ref }}" \
-            --notes-file RELEASE_NOTES.md 
+          gh release create v1.0.1 --title test --generate-notes
