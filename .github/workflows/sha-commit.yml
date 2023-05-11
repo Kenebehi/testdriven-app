@@ -21,7 +21,7 @@
           id: updated-dags-files
           uses: tj-actions/changed-files@v35
           with:
-            base_sha: "$(git rev-parse HEAD~1)"
+            since_last_remote_commit: true
             files: |
               airflow/dags/**
   
