@@ -13,6 +13,8 @@ name: Master build
 
 ## https://vault.secrets.hellofresh.io/v1/automation/dwh-cluster-automation/googleapi_gsheet
 
+# on push 0a62ca4c61399c74adb267bb5fda9ef0bd9ed6ee
+
 concurrency: Master build
 
 permissions:
