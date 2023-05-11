@@ -14,21 +14,25 @@
       steps:
         - name: Checkout repo
           uses: actions/checkout@v3
+
+        - name: Print event payload
+          run: echo "${{ toJson(github.event) }}"
+
+
+        # - name: Get changed Airflow  DAG's
+        #   id: updated-dags-files
+        #   uses: tj-actions/changed-files@v35
+        #   with:
+        #     base_sha: "14237119bd19bbf12e9ae6ce861b26fc5fc787cf"
+        #     files: |
+        #       airflow/dags/**
   
-        - name: Get changed Airflow  DAG's
-          id: updated-dags-files
-          uses: tj-actions/changed-files@v35
-          with:
-            base_sha: "14237119bd19bbf12e9ae6ce861b26fc5fc787cf"
-            files: |
-              airflow/dags/**
   
-  
-        - name: S3 Sync DAGs
-          if: ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files !=0 }}
-          env:
-            S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
-          run: |
+        # - name: S3 Sync DAGs
+        #   if: ${{ steps.updated-dags-files.outputs.all_changed_and_modified_files !=0 }}
+        #   env:
+        #     S3_AIRFLOW_DIR: s3://product-analytics-pipelines/airflow
+        #   run: |
             
-            updated_dag_files="${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
-            echo $updated_dag_files
+        #     updated_dag_files="${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
+        #     echo $updated_dag_files
