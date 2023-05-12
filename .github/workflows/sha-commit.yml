@@ -26,3 +26,16 @@
           run: echo "$(git rev-parse main~1)"
 
 
+        - name: Get previous tag name
+          id: get_previous_tag
+          run: echo "::set-output name=tag_name::$(git describe --abbrev=0 --tags ${{ github.event.release.tag_name }}^)"
+    
+        - name: Get commit SHAs
+          id: get_commit_shas
+          run: |
+            PREVIOUS_TAG=$({{ steps.get_previous_tag.outputs.tag_name }})
+            COMMIT_SHAS=$(git log --pretty=%H $PREVIOUS_TAG..${{ github.event.release.tag_name }})
+            echo "Commit SHAs: $COMMIT_SHAS"
+          
+
+
