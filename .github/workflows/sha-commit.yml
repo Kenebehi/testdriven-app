@@ -1,28 +1,28 @@
-name: 'Sync S3 DAGs and settings'
+---
 
-on:
-  release:
-    types:
-      - published
+  name: 'Sync S3 DAGs and settings'
   
-jobs:
-  sync-dags:
-    name: Copy DAGs to S3
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
+  on:
+    release:
+      types:
+        - published
+  
+  jobs:
+    sync-dags:
+      name: Copy DAGs to S3
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repo
+          uses: actions/checkout@v3
 
-      - name: Get SHA of previous commit on release branch
-        uses: tj-actions/changed-files@v35
-        with:
-          number_of_commits: 2
-        id: changed
-
-      - name: Debug output
-        run: |
-          echo "Latest commit on release branch: ${{ github.sha }}"
-          echo "Previous commit on release branch: $(git log --pretty=format:'%H' -n 1 ${{ steps.changed.outputs.files_modified }}^)"
+        - name: Debug output
+          run: |
+            echo "Current branch: $(git branch --show-current)"
+            echo "Latest commit: $(git rev-parse HEAD)"
+            echo "Previous commit: $(git rev-parse HEAD^)"
+            echo "Release target commitish: ${{ github.event.release.target_commitish }}"
         
+        - name: Print event 
+          run: echo "$(git rev-parse main~1)"
 
 
