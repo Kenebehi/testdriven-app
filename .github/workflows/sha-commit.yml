@@ -15,12 +15,31 @@
         - name: Checkout repo
           uses: actions/checkout@v3
 
-        - name: Print event payload
-          run: echo "${{ github.event.release.head.sha }}"
+        - name: Debug output
+          run: |
+            echo "Current branch: $(git branch --show-current)"
+            echo "Latest commit: $(git rev-parse HEAD)"
+            echo "Previous commit: $(git rev-parse HEAD^)"
+            echo "Release target commitish: ${{ github.event.release.target_commitish }}"
+        
 
         - name: Print event payload
           id: vars
-          run: echo "sha_short=$(git rev-parse --short HEAD^)" >> $GITHUB_OUTPUT
+          run: echo "sha_short=$(git rev-parse HEAD^)" >> $GITHUB_OUTPUT
 
         - name: Print event payload
           run: echo "{{ steps.vars.outputs.sha_short }}"
+
+        - name: Print event 
+          run: echo "${{ github.sha }}"
+
+        # Use the `git rev-parse` command to get the SHA of the previous commit.
+        - name: Get previous commit SHA
+          id: get_prev_sha
+          run: echo "::set-output name=prev_sha::$(git rev-parse HEAD^)"
+
+        # Print the SHA of the previous commit.
+        - name: Print previous commit SHA
+          run: echo "${{ steps.get_prev_sha.outputs.prev_sha }}"
+
+
