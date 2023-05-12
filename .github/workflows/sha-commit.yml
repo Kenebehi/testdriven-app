@@ -16,14 +16,18 @@
           uses: actions/checkout@v3
           with:
             fetch-depth: 0
-
-        - name: Debug output
-          run: |
-            echo "Current branch: $(git branch --show-current)"
-            echo "Release target commitish: ${{ github.event.release.target_commitish }}"
         
         - name: Print event 
+          id: prev_hash
           run: echo "$(git rev-list -n 1 $(git tag --sort=-creatordate | sed -n '2p'))"
+
+        - name: Get changed Airflow  DAG's
+          id: updated-dags-files
+          uses: tj-actions/changed-files@v35
+          with:
+            base_sha: "9912b95466cd32958193d1259d18e4dce5431eb3"
+            files: |
+              airflow/dags/**
           
 
 
