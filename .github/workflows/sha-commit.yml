@@ -1,45 +1,28 @@
----
+name: 'Sync S3 DAGs and settings'
 
-  name: 'Sync S3 DAGs and settings'
+on:
+  release:
+    types:
+      - published
   
-  on:
-    release:
-      types:
-        - published
-  
-  jobs:
-    sync-dags:
-      name: Copy DAGs to S3
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout repo
-          uses: actions/checkout@v3
+jobs:
+  sync-dags:
+    name: Copy DAGs to S3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
 
-        - name: Debug output
-          run: |
-            echo "Current branch: $(git branch --show-current)"
-            echo "Latest commit: $(git rev-parse HEAD)"
-            echo "Previous commit: $(git rev-parse HEAD^)"
-            echo "Release target commitish: ${{ github.event.release.target_commitish }}"
+      - name: Get SHA of previous commit on release branch
+        uses: tj-actions/changed-files@v35
+        with:
+          number_of_commits: 2
+        id: changed
+
+      - name: Debug output
+        run: |
+          echo "Latest commit on release branch: ${{ github.sha }}"
+          echo "Previous commit on release branch: $(git log --pretty=format:'%H' -n 1 ${{ steps.changed.outputs.files_modified }}^)"
         
-
-        - name: Print event payload
-          id: vars
-          run: echo "sha_short=$(git rev-parse HEAD^)" >> $GITHUB_OUTPUT
-
-        - name: Print event payload
-          run: echo "{{ steps.vars.outputs.sha_short }}"
-
-        - name: Print event 
-          run: echo "${{ github.sha }}"
-
-        # Use the `git rev-parse` command to get the SHA of the previous commit.
-        - name: Get previous commit SHA
-          id: get_prev_sha
-          run: echo "::set-output name=prev_sha::$(git rev-parse HEAD^)"
-
-        # Print the SHA of the previous commit.
-        - name: Print previous commit SHA
-          run: echo "${{ steps.get_prev_sha.outputs.prev_sha }}"
 
 
