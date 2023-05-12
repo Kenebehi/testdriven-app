@@ -25,7 +25,7 @@
           id: updated-dags-files
           uses: tj-actions/changed-files@v35
           with:
-            base_sha: "9912b95466cd32958193d1259d18e4dce5431eb3"
+            base_sha: "$(git rev-list -n 1 $(git tag --sort=-creatordate | sed -n '2p'))"
             files: |
               airflow/dags/**
           
