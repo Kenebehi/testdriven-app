@@ -17,15 +17,17 @@
           with:
             fetch-depth: 0
         
-        - name: Print event 
-          id: prev_hash
-          run: echo "$(git rev-list -n 1 $(git tag --sort=-creatordate | sed -n '2p'))"
+        - name: Print event Store value
+          id: store_value
+          run: |
+            MY_VALUE="$(git rev-list -n 1 $(git tag --sort=-creatordate | sed -n '2p'))"
+            echo "::set-output name=myOutput::$MY_VALUE"
 
         - name: Get changed Airflow  DAG's
           id: updated-dags-files
           uses: tj-actions/changed-files@v35
           with:
-            base_sha: "$(git rev-list -n 1 $(git tag --sort=-creatordate | sed -n '2p'))"
+            base_sha: "${{ steps.store_value.outputs.myOutput }}"
             files: |
               airflow/dags/**
           
