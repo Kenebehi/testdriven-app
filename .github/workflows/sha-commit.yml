@@ -21,17 +21,7 @@
           id: store_value
           run: |
             MY_VALUE="$(git rev-list -n 1 $(git tag --sort=-creatordate | sed -n '2p'))"
-            echo "::set-output name=myOutput::$MY_VALUE"
-
-        - name: Set output
-          id: set_output
-          run: |
-            MY_VALUE="$(git rev-list -n 1 $(git tag --sort=-creatordate | sed -n '2p'))"
-            echo "prev_hash=MY_VALUE >> $GITHUB_OUTPUT"
-
-        - name: print output
-          run: |
-              echo  "${{ steps.set_output.outputs.prev_hash }}"          
+            echo "::set-output name=myOutput::$MY_VALUE"         
 
         - name: Get changed Airflow  DAG's
           id: updated-dags-files
@@ -41,5 +31,8 @@
             files: |
               airflow/dags/**
           
+        - name: print changed files
+          run: |
+            echo "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
 
 
