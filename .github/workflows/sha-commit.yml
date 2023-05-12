@@ -14,6 +14,8 @@
       steps:
         - name: Checkout repo
           uses: actions/checkout@v3
+          with:
+            fetch-depth: 2
 
         - name: Debug output
           run: |
