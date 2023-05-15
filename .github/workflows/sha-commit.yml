@@ -20,7 +20,7 @@
         - name: Get merge branch sha
           id: merge-branch-sha
           run: |
-            git rev-parse HEAD
+            git rev-parse HEAD^
   
 
         - name: Print SHA_ID
