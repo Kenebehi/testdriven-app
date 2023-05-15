@@ -5,7 +5,7 @@
   on:
     release:
       types:
-        - published
+        - created
   
   jobs:
     sync-dags:
@@ -16,23 +16,32 @@
           uses: actions/checkout@v3
           with:
             fetch-depth: 0
-        
-        - name: Print event Store value
-          id: store_value
-          run: |
-            SHA_ID="$(git rev-list -n 1 $(git tag --sort=-creatordate | sed -n '2p'))"
-            echo "::set-output name=myOutput::$SHA_ID"         
 
-        - name: Get changed Airflow  DAG's
-          id: updated-dags-files
-          uses: tj-actions/changed-files@v35
-          with:
-            base_sha: "${{ steps.store_value.outputs.myOutput }}"
-            files: |
-              airflow/dags/**
-          
-        - name: print changed files
+        - name: Get merge branch sha
+          id: merge-branch-sha
           run: |
-            echo "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
+            git rev-parse HEAD
+  
+        - name: Get master release branch sha
+          id: master-release-sha
+          run: |
+              git rev-parse refs/heads/master    
+
+        - name: Print SHA_ID
+          run: |
+            echo "merge branch sha ${{ steps.merge-branch-sha.outputs.id }}"
+            echo "master release sha ${{ steps.master-release-sha.outputs.id }}"
+
+        # - name: Get changed Airflow  DAG's
+        #   id: updated-dags-files
+        #   uses: tj-actions/changed-files@v35
+        #   with:
+        #     base_sha: "${{ steps.store_value.outputs.myOutput }}"
+        #     files: |
+        #       airflow/dags/**
+          
+        # - name: print changed files
+        #   run: |
+        #     echo "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
 
 
