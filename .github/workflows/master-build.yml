@@ -45,3 +45,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create v1.0.1 --title test --generate-notes
+
+        # - name: Get changed Airflow  DAG's
+        #   id: updated-dags-files
+        #   uses: tj-actions/changed-files@v35
+        #   with:
+        #     base_sha: "${{ steps.store_value.outputs.myOutput }}"
+        #     files: |
+        #       airflow/dags/**
+          
+        # - name: print changed files
+        #   run: |
+        #     echo "${{ steps.updated-dags-files.outputs.all_changed_and_modified_files }}"
