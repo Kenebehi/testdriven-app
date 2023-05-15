@@ -20,8 +20,8 @@
         - name: Print event Store value
           id: store_value
           run: |
-            MY_VALUE="$(git rev-list -n 1 $(git tag --sort=-creatordate | sed -n '2p'))"
-            echo "::set-output name=myOutput::$MY_VALUE"         
+            SHA_ID="$(git rev-list -n 1 $(git tag --sort=-creatordate | sed -n '2p'))"
+            echo "::set-output name=myOutput::$SHA_ID"         
 
         - name: Get changed Airflow  DAG's
           id: updated-dags-files
